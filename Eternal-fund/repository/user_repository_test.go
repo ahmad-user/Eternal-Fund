@@ -38,8 +38,6 @@ func (suite *UsersRepoTestSuite) TestFindByEmail_Success() {
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}
-
-	// Mock query database dan hasilnya
 	suite.mockSql.ExpectQuery(`SELECT \* FROM users WHERE email=\$1`).
 		WithArgs(email).
 		WillReturnRows(
@@ -153,10 +151,10 @@ func (suite *UsersRepoTestSuite) TestUpdate_Success() {
 				AddRow(time.Now()),
 		)
 	user, err := suite.repo.Update(model.User{
-		ID:           userID,
-		Name:         updatedName,
-		Occupation:   updatedOccupation,
-		Email:        updatedEmail,
+		ID:         userID,
+		Name:       updatedName,
+		Occupation: updatedOccupation,
+		Email:      updatedEmail,
 	})
 	assert.NoError(suite.T(), err, "Expected no error")
 	assert.NotNil(suite.T(), user.UpdatedAt, "Expected UpdatedAt to be set")

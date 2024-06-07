@@ -44,7 +44,6 @@ func (m *TransactionRepoMock) UpdatePaymentURL(transaction model.Transaction) (m
 
 func (m *TransactionRepoMock) FindAll(page int, size int) ([]model.Transaction, dto.Paging, error) {
 	args := m.Called(page, size)
-	// Pastikan bahwa nilai yang dikembalikan sesuai dengan yang diharapkan oleh interface asli.
 	return args.Get(0).([]model.Transaction), args.Get(1).(dto.Paging), args.Error(2)
 }
 

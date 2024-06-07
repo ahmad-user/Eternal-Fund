@@ -43,7 +43,6 @@ func (uc *transactionUseCase) CreateTransaction(input model.CreateTransactionInp
 		UpdatedAt:  time.Now(),
 	}
 
-	// Log input data
 	fmt.Printf("Creating transaction: %+v\n", transaction)
 
 	savedTransaction, err := uc.transactionRepo.Save(transaction)
@@ -110,17 +109,11 @@ func (u *transactionUseCase) ProcessPayment(input model.TransactionNotificationI
 }
 
 func (uc *transactionUseCase) UpdateTransaction(transactionID int, input model.UpdateTransactionInput) (model.Transaction, error) {
-	// Fetch the existing transaction
 	transaction, err := uc.transactionRepo.GetByID(transactionID)
 	if err != nil {
 		return model.Transaction{}, err
 	}
-
-	// Update the transaction fields
-	// transaction.Amount = input.Amount
 	transaction.Status = input.Status
-
-	// Save the updated transaction
 	updatedTransaction, err := uc.transactionRepo.Update(transaction)
 	if err != nil {
 		return model.Transaction{}, err

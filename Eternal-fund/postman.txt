@@ -1,0 +1,84 @@
+// users
+POST:
+http://localhost:2000/api/v1/register
+{
+  "name": "ahmad aja",
+  "occupation": "Engineer",
+  "email": "ahmad123@gmail.com",
+  "password": "pass"
+}
+
+POST:
+http://localhost:2000/api/v1/auth/login
+ {
+     "email": "ahmad123@gmail.com",
+     "password": "pass"
+  }
+GET:
+http://localhost:2000/api/v1/users
+
+GetById:
+http://localhost:2000/api/v1/users/4
+
+PUT:
+http://localhost:2000/api/v1/users/4
+{
+  "name": "John Doe",
+  "occupation": "Engineer",
+  "email": "ahmad1@gmail.com",
+  "password": "pass"
+}
+
+POST:
+http://localhost:2000/api/v1/users/4/avatar
+form-data
+avatar
+
+GET:
+http://localhost:2000/api/v1/users/check-email
+{
+    "email": "john.doe@example.com"
+}
+
+// Champaigns
+POST:
+http://localhost:2000/api/v1/campaigns
+{
+    "name": "Campaign Title",
+    "short_description": "Short description of the campaign",
+    "description": "Detailed description of the campaign",
+    "goal_amount": 10000,
+    "perks": "List of perks",
+    "user_id": 1
+}
+
+GET
+http://localhost:2000/api/v1/campaigns
+
+// Transaction
+POST:
+http://localhost:2000/api/v1/transactions
+{
+  "campaign_id": 3,
+  "amount": 1000
+}
+
+PUT:
+http://localhost:2000/api/v1/transactions/6
+{
+   "amount": 200,
+    "status": "completed"
+}
+
+GetById:
+http://localhost:2000/api/v1/transactions/26
+
+GetByIdUser:
+http://localhost:2000/api/v1/users/1/transactions
+
+post:
+http://localhost:2000/api/v1/transactions/notification
+{
+    "transaction_status": "settlement",
+    "order_id": "TRX-1717444925"
+}

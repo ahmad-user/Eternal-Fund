@@ -45,33 +45,27 @@ func (u *userController) listHandler(ctx *gin.Context) {
 }
 
 func (u *userController) getByIdHandler(ctx *gin.Context) {
-    idStr := ctx.Param("user_id")
-    id, err := strconv.Atoi(idStr)
-    if err != nil {
-        // Jika terjadi error saat parsing, kirim respons error ke client
-        ctx.JSON(http.StatusBadRequest, gin.H{
-            "error": "Invalid user ID format",
-        })
-        return // Pastikan untuk menghentikan eksekusi dengan return
-    }
+	idStr := ctx.Param("user_id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid user ID format",
+		})
+	}
 
-    data, err := u.userUseCase.FindById(id)
-    if err != nil {
-        // Jika user tidak ditemukan, kirim respons error ke client
-        ctx.JSON(http.StatusNotFound, gin.H{
-            "error": "User not found",
-        })
-        return // Pastikan untuk menghentikan eksekusi dengan return
-    }
-
-    // Jika tidak ada error, kirim data user sebagai respons
-    ctx.JSON(http.StatusOK, &dto.SingleResponse{
-        Status: dto.Status{
-            Code:    http.StatusOK,
-            Message: "ok",
-        },
-        Data: data,
-    })
+	data, err := u.userUseCase.FindById(id)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"error": "User not found",
+		})
+	}
+	ctx.JSON(http.StatusOK, &dto.SingleResponse{
+		Status: dto.Status{
+			Code:    http.StatusOK,
+			Message: "ok",
+		},
+		Data: data,
+	})
 }
 
 func (u *userController) registerHandler(ctx *gin.Context) {
@@ -91,75 +85,64 @@ func (u *userController) registerHandler(ctx *gin.Context) {
 }
 
 func (u *userController) updateUserHandler(ctx *gin.Context) {
-    var input model.User
-    if err := ctx.ShouldBindJSON(&input); err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
-        return
-    }
+	var input model.User
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
 
-    userIdStr := ctx.Param("user_id")
-    userId, err := strconv.Atoi(userIdStr)
-    if err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid user ID")
-        return
-    }
+	userIdStr := ctx.Param("user_id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
 
-    input.ID = userId // Set the ID to the input struct
-    updatedUser, err := u.userUseCase.UpdateUser(userId, input)
-    if err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
-        return
-    }
+	input.ID = userId
+	updatedUser, err := u.userUseCase.UpdateUser(userId, input)
+	if err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-    commonresponse.SendSingleResponse(ctx, updatedUser, "User updated successfully")
+	commonresponse.SendSingleResponse(ctx, updatedUser, "User updated successfully")
 }
 
-
 func (u *userController) saveAvatarHandler(ctx *gin.Context) {
-    userIdStr := ctx.Param("id")
-    userId, err := strconv.Atoi(userIdStr)
-    if err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid user ID")
-        return
-    }
+	userIdStr := ctx.Param("id")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid user ID")
+		return
+	}
 
-    file, err := ctx.FormFile("avatar")
-    if err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
-        return
-    }
+	file, err := ctx.FormFile("avatar")
+	if err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	ext := filepath.Ext(file.Filename)
+	if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
+		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid file type")
+		return
+	}
+	newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+	fileLocation := "images/avatars/" + newFileName
+	if err := os.MkdirAll("images/avatars", os.ModePerm); err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, "Could not create directory")
+		return
+	}
+	if err := ctx.SaveUploadedFile(file, fileLocation); err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	user, err := u.userUseCase.SaveAvatar(userId, fileLocation)
+	if err != nil {
+		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-    // Validasi ekstensi file
-    ext := filepath.Ext(file.Filename)
-    if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
-        commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid file type")
-        return
-    }
-
-    // Pembuatan nama file yang unik
-    newFileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-    fileLocation := "images/avatars/" + newFileName
-
-    // Pembuatan direktori jika belum ada
-    if err := os.MkdirAll("images/avatars", os.ModePerm); err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, "Could not create directory")
-        return
-    }
-
-    // Menyimpan file yang diunggah
-    if err := ctx.SaveUploadedFile(file, fileLocation); err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
-        return
-    }
-
-    // Menyimpan lokasi file avatar dalam database
-    user, err := u.userUseCase.SaveAvatar(userId, fileLocation)
-    if err != nil {
-        commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
-        return
-    }
-
-    commonresponse.SendSingleResponse(ctx, user, "Avatar saved successfully")
+	commonresponse.SendSingleResponse(ctx, user, "Avatar saved successfully")
 }
 
 func (u *userController) isEmailAvailableHandler(ctx *gin.Context) {

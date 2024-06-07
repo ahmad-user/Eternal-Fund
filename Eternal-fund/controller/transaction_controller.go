@@ -117,7 +117,6 @@ func (t *TransactionController) createTransaction(ctx *gin.Context) {
 	commonresponse.SendSingleResponse(ctx, transaction, "Transaction created successfully")
 }
 
-// UpdateTransaction updates an existing transaction
 func (t *TransactionController) UpdateTransaction(ctx *gin.Context) {
 	transactionID, err := strconv.Atoi(ctx.Param("transaction_id"))
 	if err != nil {
@@ -130,8 +129,6 @@ func (t *TransactionController) UpdateTransaction(ctx *gin.Context) {
 		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-
-	// Panggil use case untuk memperbarui transaksi
 	transaction, err := t.transactionUC.UpdateTransaction(transactionID, input)
 	if err != nil {
 		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, err.Error())
@@ -187,12 +184,9 @@ func (t *TransactionController) getNotification(ctx *gin.Context) {
 
 }
 
-// Fungsi untuk verifikasi notifikasi dari Midtrans menggunakan Resty
 func (t *TransactionController) verifyNotification(orderID string, transactionStatus string) (bool, error) {
 	client := resty.New()
-
-	// Basic auth menggunakan Server Key
-	serverKey := os.Getenv("MIDTRANS_SERVER_KEY") // Gantilah ini dengan server key Midtrans Anda
+	serverKey := os.Getenv("MIDTRANS_SERVER_KEY")
 	response, err := client.R().
 		SetHeader("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(serverKey+":"))).
 		Get("https://api.sandbox.midtrans.com/v2/" + orderID + "/status")

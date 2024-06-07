@@ -28,12 +28,12 @@ func (u *userRepo) Save(user model.User) (model.User, error) {
 }
 
 func (u *userRepo) Update(user model.User) (model.User, error) {
-    query := "UPDATE users SET name = $1, occupation = $2, email = $3, updated_at = NOW() WHERE id = $4 RETURNING id, name, occupation, email, updated_at"
-    err := u.db.QueryRow(query, user.Name, user.Occupation, user.Email, user.ID).Scan(&user.ID, &user.Name, &user.Occupation, &user.Email, &user.UpdatedAt)
-    if err != nil {
-        return user, err
-    }
-    return user, nil
+	query := "UPDATE users SET name = $1, occupation = $2, email = $3, updated_at = NOW() WHERE id = $4 RETURNING id, name, occupation, email, updated_at"
+	err := u.db.QueryRow(query, user.Name, user.Occupation, user.Email, user.ID).Scan(&user.ID, &user.Name, &user.Occupation, &user.Email, &user.UpdatedAt)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
 func (u *userRepo) SaveAvatar(userId int, fileLocation string) (model.User, error) {
@@ -97,7 +97,6 @@ func (u *userRepo) FindAll(page int, size int) ([]model.User, dto.Paging, error)
 
 }
 
-// findById implements UserRepo.
 func (u *userRepo) FindById(id int) (model.User, error) {
 	var user model.User
 	var avatarFileName sql.NullString
@@ -118,7 +117,6 @@ func (u *userRepo) FindById(id int) (model.User, error) {
 
 }
 
-// FindByEmail implements UserRepo.
 func (u *userRepo) FindByEmail(email string) (model.User, error) {
 	var user model.User
 	var avatarFileName sql.NullString

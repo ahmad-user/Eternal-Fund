@@ -20,20 +20,15 @@ type AuthHeader struct {
 	Autheader string `header:"Authorization" required:"true"`
 }
 
-// CheckToken implements AuthMiddleware.
 func (a *authMiddleware) CheckToken(roles ...string) gin.HandlerFunc {
 
 	return func(ctx *gin.Context) {
 		var header AuthHeader
-
-		// Bind Authorization header
 		if err := ctx.ShouldBindHeader(&header); err != nil {
 			log.Println("Authorization header missing or malformed")
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
-		// Extract token from header
 		token := strings.Replace(header.Autheader, "Bearer ", "", -1)
 		claims, err := a.jwtService.ValidateToken(token)
 		if err != nil {
@@ -58,10 +53,6 @@ func (a *authMiddleware) CheckToken(roles ...string) gin.HandlerFunc {
 
 		ctx.Set("userID", userId) // Convert float64 ke int
 		log.Printf("User ID set in context: %d", userId)
-
-		// ctx.Set("user", claims["userId"])
-
-		// Validate user role
 		validRole := false
 		for _, role := range roles {
 			if role == claims["role"] {
@@ -74,8 +65,6 @@ func (a *authMiddleware) CheckToken(roles ...string) gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
-		// Proceed to the next handler
 		ctx.Next()
 
 	}

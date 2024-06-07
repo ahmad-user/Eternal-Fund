@@ -32,20 +32,19 @@ func (u *userUseCase) RegisterUser(input model.RegisterUserInput) (model.User, e
 }
 
 func (u *userUseCase) UpdateUser(userId int, input model.User) (model.User, error) {
-    user, err := u.repo.FindById(userId)
-    if err != nil {
-        return user, err
-    }
-    user.Name = input.Name
-    user.Occupation = input.Occupation
-    user.Email = input.Email
-    updatedUser, err := u.repo.Update(user)
-    if err != nil {
-        return updatedUser, err
-    }
-    return updatedUser, nil
+	user, err := u.repo.FindById(userId)
+	if err != nil {
+		return user, err
+	}
+	user.Name = input.Name
+	user.Occupation = input.Occupation
+	user.Email = input.Email
+	updatedUser, err := u.repo.Update(user)
+	if err != nil {
+		return updatedUser, err
+	}
+	return updatedUser, nil
 }
-
 
 func (u *userUseCase) SaveAvatar(userId int, fileLocation string) (model.User, error) {
 	return u.repo.SaveAvatar(userId, fileLocation)
@@ -62,13 +61,10 @@ func (u *userUseCase) IsEmailAvailable(input model.CheckEmailInput) (bool, error
 	}
 	return false, nil
 }
-
-// findAll implements AuthorUseCase.
 func (u *userUseCase) FindAll(page int, size int) ([]model.User, dto.Paging, error) {
 	return u.repo.FindAll(page, size)
 }
 
-// findById implements userUseCase.
 func (u *userUseCase) FindById(id int) (model.User, error) {
 	return u.repo.FindById(id)
 }

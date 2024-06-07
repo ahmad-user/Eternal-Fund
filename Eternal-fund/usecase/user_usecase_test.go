@@ -178,9 +178,6 @@ func (suite *UsersUseCaseTestSuite) TestIsEmailAvailable_FailedByUnexpectedError
 	assert.Equal(suite.T(), "unexpected error", err.Error(), "Expected error message to match")
 }
 
-// Add more tests for SaveAvatar, FindAll, FindById, FindByEmail with failure scenarios
-// ...
-
 func TestUsersUseCaseTestSuite(t *testing.T) {
 	suite.Run(t, new(UsersUseCaseTestSuite))
 }

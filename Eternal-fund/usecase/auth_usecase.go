@@ -10,10 +10,9 @@ type AuthUseCase interface {
 }
 type authUseCase struct {
 	jwtService service.JwtService
-	userUC   UserUseCase
+	userUC     UserUseCase
 }
 
-// Login implements AuthUseCase.
 func (a *authUseCase) Login(payload dto.AuthReqDto) (dto.AuthResponDto, error) {
 	user, err := a.userUC.FindByEmail(payload.Email)
 	if err != nil {
