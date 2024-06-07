@@ -118,39 +118,6 @@ func (cc *campaignController) deleteCampaignHandler(ctx *gin.Context) {
 	commonresponse.SendSingleResponse(ctx, nil, "Campaign deleted successfully")
 }
 
-func (cc *campaignController) uploadCampaignImageHandler(ctx *gin.Context) {
-	campaignID, err := strconv.Atoi(ctx.Param("campaign_id"))
-	if err != nil {
-		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Invalid campaign ID")
-		return
-	}
-	file, err := ctx.FormFile("file")
-	if err != nil {
-		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, "Error in file upload: "+err.Error())
-		return
-	}
-
-	var input model.CampaignImage
-	if err := ctx.ShouldBind(&input); err != nil {
-		commonresponse.SendErrorResponse(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
-	fileLocation := "images/campaigns/" + file.Filename
-	if err := ctx.SaveUploadedFile(file, fileLocation); err != nil {
-		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, "Error saving file: "+err.Error())
-		return
-	}
-	input.CampaignID = campaignID
-	input.FileLocation = fileLocation
-	campaignImage, err := cc.campaignUseCase.SaveCampaignImage(input, fileLocation)
-	if err != nil {
-		commonresponse.SendErrorResponse(ctx, http.StatusInternalServerError, "Error saving campaign image: "+err.Error())
-		return
-	}
-
-	commonresponse.SendSingleResponse(ctx, campaignImage, "Campaign image uploaded successfully")
-}
-
 func (cc *campaignController) Routing() {
 	cc.router.POST("/campaigns", cc.authMiddleware.CheckToken("user", "admin"), cc.createCampaignHandler)
 	cc.router.GET("/campaigns", cc.getCampaignsHandler)
@@ -158,7 +125,6 @@ func (cc *campaignController) Routing() {
 	cc.router.PUT("/campaigns/:campaign_id", cc.authMiddleware.CheckToken("user", "admin"), cc.updateCampaignHandler)
 	cc.router.DELETE("/campaigns/:campaign_id", cc.authMiddleware.CheckToken("user", "admin"), cc.deleteCampaignHandler)
 
-	cc.router.POST("/campaigns/:campaign_id/images", cc.authMiddleware.CheckToken("user", "admin"), cc.uploadCampaignImageHandler)
 }
 
 func NewCampaignsController(campaignUseCase usecase.CampaignsUseCase, rg *gin.RouterGroup, authMiddleware middleware.AuthMiddleware) *campaignController {

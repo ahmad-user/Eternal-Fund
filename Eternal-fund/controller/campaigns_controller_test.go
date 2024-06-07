@@ -268,57 +268,6 @@ func (suite *CampaignsControllerTestSuite) TestCreateCampaignHandler_success() {
 	mockCampaignUseCase.AssertExpectations(suite.T())
 }
 
-// func (suite *CampaignsControllerTestSuite) TestUploadCampaignImageHandler_success() {
-// 	w := httptest.NewRecorder()
-// 	ginContext, _ := gin.CreateTestContext(w)
-// 	campaignID := "123"
-// 	ginContext.Params = append(ginContext.Params, gin.Param{Key: "campaign_id", Value: campaignID})
-// 	filename := "erd.png"
-// 	file, err := os.Open(" eternal-fund/images/avatars/" + filename)
-// 	if err != nil {
-// 		suite.T().Fatal("Failed to open test file:", err)
-// 	}
-// 	defer file.Close()
-
-// 	fileHeader := &multipart.FileHeader{
-// 		Filename: filename,
-// 		Size:     1234,
-// 	}
-// 	body := &bytes.Buffer{}
-// 	writer := multipart.NewWriter(body)
-// 	part, _ := writer.CreateFormFile("file", fileHeader.Filename)
-// 	io.Copy(part, file)
-// 	writer.Close()
-// 	ginContext.Request = httptest.NewRequest(http.MethodPost, "/api/upload/"+campaignID, body)
-// 	ginContext.Request.Header.Set("Content-Type", writer.FormDataContentType())
-// 	input := model.CampaignImage{
-// 		CampaignID:   123,
-// 		FileLocation: " eternal-fund/images/campaigns/" + fileHeader.Filename,
-// 	}
-// 	mockCampaignImage := input
-// 	mockCampaignImage.ID = 1
-// 	mockCampaignUseCase := &mocking.CampaignsUseCaseMock{}
-// 	mockCampaignUseCase.On("SaveCampaignImage", mock.AnythingOfType("model.CampaignImage"), mock.AnythingOfType("string")).Return(mockCampaignImage, nil)
-// 	controller := &campaignController{
-// 		campaignUseCase: mockCampaignUseCase,
-// 	}
-// 	controller.uploadCampaignImageHandler(ginContext)
-// 	assert.Equal(suite.T(), http.StatusOK, w.Code)
-// 	var responseBody dto.SingleResponse
-// 	err = json.Unmarshal(w.Body.Bytes(), &responseBody)
-// 	assert.Nil(suite.T(), err)
-// 	status := responseBody.Status
-// 	assert.Equal(suite.T(), http.StatusOK, status.Code)
-// 	assert.Equal(suite.T(), "Campaign image uploaded successfully", status.Message)
-// 	data := responseBody.Data
-// 	uploadedImage, ok := data.(model.CampaignImage)
-// 	assert.True(suite.T(), ok)
-// 	assert.Equal(suite.T(), mockCampaignImage.ID, uploadedImage.ID)
-// 	assert.Equal(suite.T(), mockCampaignImage.CampaignID, uploadedImage.CampaignID)
-// 	assert.Equal(suite.T(), mockCampaignImage.FileLocation, uploadedImage.FileLocation)
-// 	mockCampaignUseCase.AssertExpectations(suite.T())
-// }
-
 func TestAuthoRepoTestSuite(t *testing.T) {
 	suite.Run(t, new(CampaignsControllerTestSuite))
 }
